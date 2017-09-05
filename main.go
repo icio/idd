@@ -9,8 +9,23 @@ import (
 )
 
 func main() {
-	http.Handle("/", http.HandlerFunc(handler))
+	http.Handle("/", http.RedirectHandler("/index.html", http.StatusMovedPermanently))
+	http.Handle("/index.html", http.HandlerFunc(index))
+	http.Handle("/id", http.HandlerFunc(handler))
 	fmt.Println(http.ListenAndServe(":9001", nil))
+}
+
+func index(w http.ResponseWriter, req *http.Request) {
+	w.Write([]byte(`<html>
+		<head>
+			<script src="/id"></script>
+		</head>
+		<body>
+			<h1>Test</h1>
+			<pre id="cookies"></pre>
+			<script>document.getElementById("cookies").innerText = document.cookie</script>
+		</body>
+	</html>`))
 }
 
 func handler(w http.ResponseWriter, req *http.Request) {
